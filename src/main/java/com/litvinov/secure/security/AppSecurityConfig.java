@@ -1,6 +1,8 @@
 package com.litvinov.secure.security;
 
 import com.litvinov.secure.auth.MyUserDetailsService;
+import com.litvinov.secure.jwt.JwtUsernameAndPasswordAuthFilter;
+import com.litvinov.secure.jwt.JwtVerifyier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -39,29 +42,16 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                . and()
+                .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager()))
+                .addFilterAfter(new JwtVerifyier(), JwtUsernameAndPasswordAuthFilter.class)
                 .authorizeRequests()
                 .antMatchers("/","index","/css/*","/js/*","login").permitAll()
                 .antMatchers("/api/**").hasRole(STUDENT.name())
                 .anyRequest()
-                .authenticated()
-                .and()
-                .formLogin()
-                    .loginPage("/login").permitAll()
-                    .defaultSuccessUrl("/courses",true)
-                    .passwordParameter("password")//данные для файла login.html если нужно поменять атрибут в html
-                    .usernameParameter("username")
-                .and()
-                .rememberMe()
-                .tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
-                .key("somesecurity")
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout","GET"))
-                .clearAuthentication(true)
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID","remember-me")
-                .logoutSuccessUrl("/login");
+                .authenticated();
+
 
     }
 
