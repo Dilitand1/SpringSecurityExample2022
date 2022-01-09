@@ -3,6 +3,7 @@ package com.litvinov.secure.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -16,6 +17,7 @@ import static com.litvinov.secure.security.UserPermission.COURSE_WRITE;
 import static com.litvinov.secure.security.UserRole.*;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -33,10 +35,10 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeHttpRequests()
                 .antMatchers("/","index","/css/*","/js/*").permitAll()
                 .antMatchers("/api/**").hasRole(STUDENT.name())
-                .antMatchers(HttpMethod.DELETE,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .antMatchers(HttpMethod.POST,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .antMatchers(HttpMethod.PUT,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .antMatchers("/manage/api/**").hasAnyRole(ADMIN.name(), ADMINTRAIN.name())
+//                .antMatchers(HttpMethod.DELETE,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
+//                .antMatchers(HttpMethod.POST,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
+//                .antMatchers(HttpMethod.PUT,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
+//                .antMatchers("/manage/api/**").hasAnyRole(ADMIN.name(), ADMINTRAIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
