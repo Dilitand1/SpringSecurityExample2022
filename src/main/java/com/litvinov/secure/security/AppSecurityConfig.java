@@ -1,8 +1,11 @@
 package com.litvinov.secure.security;
 
+import com.litvinov.secure.auth.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,10 +27,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     private final PasswordEncoder passwordEncoder;
+    private final MyUserDetailsService userDetailsService;
 
     @Autowired
-    public AppSecurityConfig(PasswordEncoder passwordEncoder) {
+    public AppSecurityConfig(PasswordEncoder passwordEncoder, MyUserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -60,29 +65,16 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-    @Override
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails first = User.builder()
-                .username("first")
-                .password(passwordEncoder.encode("password"))
-                .authorities(STUDENT.getGrantedAuthority())
-                //.roles("STUDENT")
-                .roles(STUDENT.name())
-                .build();
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(userDetailsService);
+        return provider;
+    }
 
-        var linda = User.builder().username("linda")
-                .password(passwordEncoder.encode("password"))
-                //.roles("ADMIN")
-//                .roles(ADMIN.name())
-                .authorities(ADMIN.getGrantedAuthority())
-                .build();
-
-        var tom = User.builder().username("tom")
-                .password(passwordEncoder.encode("password"))
-//                .roles(ADMINTRAIN.name())
-                .authorities(ADMINTRAIN.getGrantedAuthority())
-                .build();
-        return new InMemoryUserDetailsManager(first, linda, tom);
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
     }
 }
