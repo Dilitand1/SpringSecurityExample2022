@@ -3,11 +3,7 @@ package com.litvinov.secure.contr;
 import com.litvinov.secure.model.Student;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/students")
