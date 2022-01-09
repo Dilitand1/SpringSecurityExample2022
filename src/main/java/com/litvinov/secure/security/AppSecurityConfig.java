@@ -36,7 +36,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
                 .antMatchers(HttpMethod.POST,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
                 .antMatchers(HttpMethod.PUT,"/manage/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .antMatchers(HttpMethod.GET,"/manage/api/**").hasAnyRole(ADMIN.name(), ADMINTRAIN.name())
+                .antMatchers("/manage/api/**").hasAnyRole(ADMIN.name(), ADMINTRAIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
